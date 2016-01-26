@@ -36,7 +36,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "ZendTest\\InputFilter\\": "test/"
+            "ZendTest\\InputFilter\\": "test/",
+            "ZendTest\\ServiceManager\\": "vendor/zendframework/zend-servicemanager/test/"
         }
     }
 }

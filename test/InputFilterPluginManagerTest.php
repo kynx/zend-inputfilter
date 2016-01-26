@@ -18,6 +18,7 @@ use Zend\InputFilter\InputFilterInterface;
 use Zend\InputFilter\InputFilterPluginManager;
 use Zend\InputFilter\InputInterface;
 use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\Exception\InvalidServiceException;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Stdlib\InitializableInterface;
@@ -57,7 +58,7 @@ class InputFilterPluginManagerTest extends \PHPUnit_Framework_TestCase
     public function testRegisteringInvalidElementRaisesException()
     {
         $this->setExpectedException(
-            RuntimeException::class,
+            $this->getServiceNotFoundException(),
             'must implement Zend\InputFilter\InputFilterInterface or Zend\InputFilter\InputInterface'
         );
         $this->manager->setService('test', $this);
@@ -66,7 +67,7 @@ class InputFilterPluginManagerTest extends \PHPUnit_Framework_TestCase
     public function testLoadingInvalidElementRaisesException()
     {
         $this->manager->setInvokableClass('test', get_class($this));
-        $this->setExpectedException(RuntimeException::class);
+        $this->setExpectedException($this->getServiceNotFoundException());
         $this->manager->get('test');
     }
 
@@ -209,5 +210,13 @@ class InputFilterPluginManagerTest extends \PHPUnit_Framework_TestCase
         $serviceLocator = $this->getMock(ServiceLocatorInterface::class);
 
         return $serviceLocator;
+    }
+
+    protected function getServiceNotFoundException()
+    {
+        if (method_exists($this->manager, 'configure')) {
+            return InvalidServiceException::class;
+        }
+        return RuntimeException::class;
     }
 }

@@ -11,6 +11,7 @@ namespace Zend\InputFilter;
 
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\Exception\InvalidServiceException;
 use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\Stdlib\InitializableInterface;
 
@@ -40,16 +41,27 @@ class InputFilterPluginManager extends AbstractPluginManager
      * @var string[]
      */
     protected $factories = [
-        InputFilter::class  => InvokableFactory::class,
-        CollectionInputFilter::class  => InvokableFactory::class,
+        InputFilter::class                      => InvokableFactory::class,
+        CollectionInputFilter::class            => InvokableFactory::class,
+        // v2 canonical FQCN
+        'zendinputfilterinputfilter'            => InvokableFactory::class,
+        'zendinputfiltercollectioninputfilter'  => InvokableFactory::class,
     ];
 
     /**
-     * Whether or not to share by default
+     * Whether or not to share by default (v3)
      *
      * @var bool
      */
     protected $sharedByDefault = false;
+
+    /**
+     * Whether or not to share by default (v2)
+     *
+     * @var bool
+     */
+    protected $shareByDefault = false;
+
 
     /**
      * @param ContainerInterface $parentLocator
@@ -116,7 +128,7 @@ class InputFilterPluginManager extends AbstractPluginManager
             return;
         }
 
-        throw new Exception\RuntimeException(sprintf(
+        throw new InvalidServiceException(sprintf(
             'Plugin of type %s is invalid; must implement %s or %s',
             (is_object($plugin) ? get_class($plugin) : gettype($plugin)),
             InputFilterInterface::class,
@@ -136,7 +148,11 @@ class InputFilterPluginManager extends AbstractPluginManager
      */
     public function validatePlugin($plugin)
     {
-        $this->validate($plugin);
+        try {
+            $this->validate($plugin);
+        } catch (InvalidServiceException $e) {
+            throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     public function shareByDefault()
