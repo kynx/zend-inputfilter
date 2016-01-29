@@ -15,7 +15,7 @@
     "require": {
         "php": ">=5.5",
         "zendframework/zend-filter": "dev-v2-v3-compat as 2.6.0",
-        "zendframework/zend-validator": "dev-v2-v3 as 2.5",
+        "zendframework/zend-validator": "dev-v2-v3 as 2.6.0",
         "zendframework/zend-stdlib": "dev-develop as 2.8.0"
     },
     "require-dev": {
